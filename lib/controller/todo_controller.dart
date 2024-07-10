@@ -36,6 +36,7 @@ class TodoController extends GetxController {
     final box = Hive.box<ToDo>("todoBox");
     todoList.value = box.values.toList();
     searchResult.value = List<ToDo>.from(todoList);
+    sortTodo();
   }
 
   void addToDo(ToDo todo) {
@@ -43,6 +44,7 @@ class TodoController extends GetxController {
     box.add(todo);
     todoList.add(todo);
     searchResult.add(todo);
+
     ToDos();
   }
 

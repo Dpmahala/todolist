@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:todolist/controller/todo_controller.dart';
 import 'package:todolist/models/todo.dart';
+import 'package:todolist/service/notification_service.dart';
 import 'package:todolist/utils/utils.dart';
 import 'package:todolist/views/screens/add_new_task.dart';
 import 'package:todolist/widgets/my_text_field.dart';
@@ -31,6 +32,14 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController descController = TextEditingController();
 
   TextEditingController priorityController = TextEditingController();
+
+  NotificationService notificationService = NotificationService();
+
+  @override
+  void initState() {
+    super.initState();
+    notificationService.flutterLocalNotificationsPlugin;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +218,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                     onChanged: (bool? value) {
                                       setState(() {
                                         selectedItem = index;
-
+                                        if (value == true) {
+                                          todo.isCompleted = true;
+                                          notificationService.showNotification(
+                                            id: 0,
+                                            title: "Task Completed",
+                                            body:
+                                                "Congratulations! You've completed a task: ${todo.title}",
+                                          );
+                                        } else {
+                                          todo.isCompleted = false;
+                                        }
                                         final updateTodo = ToDo(
                                             title: todo.title,
                                             dateTime: todo.dateTime,
@@ -286,10 +305,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 GestureDetector(
                                   onTap: () {
                                     todoController.deleteToDo(index, todo);
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(SnackBar(
-                                      content: Text("Task Delete"),
-                                    ));
+                                    notificationService.showNotification(
+                                        id: 0,
+                                        title: "Task Delete",
+                                        body:
+                                            "Your task has been successfully deleted");
                                   },
                                   child: Container(
                                     padding: EdgeInsets.all(8.h),
@@ -346,6 +366,14 @@ class _HomeScreenState extends State<HomeScreen> {
     int selectedPriority = todo.priority;
 
     TimeOfDay? selectedTime = TimeOfDay.fromDateTime(todo.dateTime);
+
+    ToDo originalTodo = ToDo(
+        title: todo.title,
+        desc: todo.desc,
+        isCompleted: todo.isCompleted,
+        dateTime: todo.dateTime,
+        priority: todo.priority,
+        createTime: todo.createTime);
 
     showModalBottomSheet(
       isScrollControlled: true,
@@ -504,10 +532,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       GestureDetector(
                         onTap: () {
+                          bool isEdited = todo.title != originalTodo.title ||
+                              todo.desc != originalTodo.desc ||
+                              todo.dateTime != originalTodo.dateTime ||
+                              todo.priority != originalTodo.priority;
                           todoController.updateTodo(index, todo);
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text("Your Task is updated"),
-                          ));
+                          if (isEdited) {
+                            notificationService.showNotification(
+                              id: 0,
+                              title: "Task Update",
+                              body: "Your task has been successfully updated",
+                            );
+                          } else {
+                            notificationService.showNotification(
+                              id: 0,
+                              title: "Task Update",
+                              body: "No changes made to your task",
+                            );
+                          }
                           Navigator.pop(context);
                         },
                         child: Container(
@@ -525,6 +567,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       GestureDetector(
                         onTap: () {
+                          notificationService.showNotification(
+                              id: 0,
+                              title: "Cancle",
+                              body: "Your task has been not update");
                           Navigator.pop(context);
                         },
                         child: Container(

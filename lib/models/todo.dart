@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 part 'todo.g.dart';
 
 @HiveType(typeId: 0)
-class ToDo {
+class ToDo extends HiveObject {
   @HiveField(0)
   late String title;
 
@@ -22,6 +22,11 @@ class ToDo {
   @HiveField(5)
   late DateTime createTime;
 
+  @HiveField(6)
+  late DateTime? reminderTime;
+  @HiveField(7)
+  late int id;
+
   ToDo({
     required this.title,
     required this.desc,
@@ -29,5 +34,6 @@ class ToDo {
     required this.dateTime,
     required this.priority,
     required this.createTime,
+    this.reminderTime,
   });
 }

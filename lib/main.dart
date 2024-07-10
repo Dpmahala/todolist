@@ -4,6 +4,7 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:todolist/models/todo.dart';
+import 'package:todolist/service/notification_service.dart';
 import 'package:todolist/views/screens/home_screen.dart';
 
 void main() async {
@@ -14,6 +15,7 @@ void main() async {
   await Hive.openBox<ToDo>("todoBox");
   if (!Hive.isBoxOpen("todoBox")) {
     await Hive.openBox<ToDo>("todoBox");
+    await NotificationService().flutterLocalNotificationsPlugin;
   }
   runApp(const MyApp());
 }
