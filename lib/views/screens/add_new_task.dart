@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:todolist/controller/todo_controller.dart';
 import 'package:todolist/models/todo.dart';
+import 'package:todolist/service/notification_service.dart';
 import 'package:todolist/utils/utils.dart';
 import 'package:todolist/views/screens/home_screen.dart';
 import 'package:todolist/widgets/my_text_field.dart';
@@ -26,6 +27,14 @@ class _AddNewTaskState extends State<AddNewTask> {
   DateTime? selectedDateTime;
 
   TimeOfDay? selectedTime;
+
+  NotificationService notificationService = NotificationService();
+
+  @override
+  void initState() {
+    super.initState();
+    notificationService.flutterLocalNotificationsPlugin;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -260,9 +269,10 @@ class _AddNewTaskState extends State<AddNewTask> {
       );
 
       todoController.addToDo(newTodo);
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("New Task Added")));
+      notificationService.showNotification(
+          id: 0, title: "New Task", body: "New task added");
+      // ScaffoldMessenger.of(context)
+      //     .showSnackBar(SnackBar(content: Text("New Task Added")));
       Get.offAll(HomeScreen());
     } else {
       ScaffoldMessenger.of(context)
